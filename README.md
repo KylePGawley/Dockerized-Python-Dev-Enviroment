@@ -1,2 +1,2 @@
 # python
-all my python work
+Learning python and docker at the same time. FUN!
