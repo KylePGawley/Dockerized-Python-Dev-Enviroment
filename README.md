@@ -1,5 +1,5 @@
 # python
-Building my first Dockerized Python development enviorment.
+Building my first Local Dockerized Python development enviorment.
 
 following along with https://www.youtube.com/watch?v=6OxqiEeCvMI 
 
