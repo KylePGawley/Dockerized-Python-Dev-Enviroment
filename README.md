@@ -5,3 +5,5 @@ following along with https://www.youtube.com/watch?v=6OxqiEeCvMI
 
 Patrick Loeber https://github.com/patrickloeber/python-docker-tutorial
 Anca Iordache https://www.docker.com/blog/containerized-python-development-part-1/
+
+added a working To-do python web application. mostly using claude code.
