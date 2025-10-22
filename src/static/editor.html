@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Editor</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #f5f5f5;
+        }
+
+        /* Header with title and controls */
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Control buttons */
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .controls input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.danger {
+            background: #e74c3c;
+        }
+
+        button.danger:hover {
+            background: #c0392b;
+        }
+
+        button.success {
+            background: #27ae60;
+        }
+
+        button.success:hover {
+            background: #229954;
+        }
+
+        /* Main container with sidebar and editor */
+        .container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar with file list */
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar h2 {
+            padding: 1rem;
+            background: #34495e;
+            color: white;
+            font-size: 1rem;
+        }
+
+        #fileList {
+            flex: 1;
+            overflow-y: auto;
+            list-style: none;
+        }
+
+        #fileList li {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #fileList li:hover {
+            background: #ecf0f1;
+        }
+
+        #fileList li.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .file-actions button {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* Editor and preview split view */
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-tabs {
+            display: flex;
+            background: #34495e;
+            padding: 0.5rem 1rem;
+            gap: 1rem;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: #bdc3c7;
+            border: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: white;
+            border-bottom-color: #3498db;
+        }
+
+        .split-view {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Code editor */
+        .editor-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-right: 1px solid #ddd;
+        }
+
+        #codeEditor {
+            flex: 1;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+        }
+
+        /* Preview panel */
+        .preview-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        #preview {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: white;
+        }
+
+        /* Status bar */
+        .status-bar {
+            padding: 0.5rem 1rem;
+            background: #34495e;
+            color: white;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Message display */
+        .message {
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 1rem;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with title and main controls -->
+    <header>
+        <h1>HTML Editor</h1>
+        <div class="controls">
+            <input type="text" id="filenameInput" placeholder="Enter filename (e.g., mypage.html)">
+            <button onclick="newFile()">New</button>
+            <button onclick="saveFile()" class="success">Save</button>
+            <button onclick="updatePreview()">Preview</button>
+            <button onclick="viewInBrowser()" class="success">View in Browser</button>
+        </div>
+    </header>
+
+    <!-- Message area for feedback -->
+    <div id="message" class="message"></div>
+
+    <!-- Main container -->
+    <div class="container">
+        <!-- Sidebar with file list -->
+        <aside class="sidebar">
+            <h2>Saved Files</h2>
+            <ul id="fileList"></ul>
+        </aside>
+
+        <!-- Editor area -->
+        <main class="editor-container">
+            <!-- Tabs for editor and preview -->
+            <div class="editor-tabs">
+                <button class="tab active" onclick="showEditor()">Code Editor</button>
+                <button class="tab" onclick="showPreview()">Preview</button>
+            </div>
+
+            <!-- Split view with editor and preview -->
+            <div class="split-view">
+                <div class="editor-panel" id="editorPanel">
+                    <textarea id="codeEditor" placeholder="Start typing your HTML here..."></textarea>
+                </div>
+                <div class="preview-panel" id="previewPanel">
+                    <iframe id="preview"></iframe>
+                </div>
+            </div>
+
+            <!-- Status bar -->
+            <div class="status-bar">
+                <span id="currentFile">No file loaded</span>
+                <span id="charCount">0 characters</span>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+
+        let currentFilename = null;  // Track currently open file
+        let isDirty = false;         // Track if file has unsaved changes
+
+        // Get references to DOM elements
+        const codeEditor = document.getElementById('codeEditor');
+        const preview = document.getElementById('preview');
+        const filenameInput = document.getElementById('filenameInput');
+        const fileList = document.getElementById('fileList');
+        const currentFileSpan = document.getElementById('currentFile');
+        const charCount = document.getElementById('charCount');
+        const messageDiv = document.getElementById('message');
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        // Load file list when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFileList();
+            // Update character count as user types
+            codeEditor.addEventListener('input', () => {
+                isDirty = true;
+                updateCharCount();
+            });
+            // Initial preview
+            updatePreview();
+        });
+
+        // ============================================
+        // FILE OPERATIONS
+        // ============================================
+
+        /**
+         * Load list of all saved HTML files from the server
+         * This function makes a GET request to /api/html-files
+         */
+        async function loadFileList() {
+            try {
+                const response = await fetch('/api/html-files');
+                const data = await response.json();
+
+                // Clear existing list
+                fileList.innerHTML = '';
+
+                // Create list item for each file
+                data.files.forEach(file => {
+                    const li = document.createElement('li');
+                    li.className = currentFilename === file.filename ? 'active' : '';
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = file.filename;
+                    nameSpan.onclick = () => openFile(file.filename);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'file-actions';
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.className = 'danger';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteFile(file.filename);
+                    };
+
+                    actions.appendChild(deleteBtn);
+                    li.appendChild(nameSpan);
+                    li.appendChild(actions);
+                    fileList.appendChild(li);
+                });
+            } catch (error) {
+                showMessage('Error loading file list: ' + error.message, 'error');
+            }
+        }
+
+        /**
+         * Open and load a file from the server
+         * Makes a GET request to /api/html-files/{filename}
+         */
+        async function openFile(filename) {
+            try {
+                const response = await fetch(`/api/html-files/${filename}`);
+                if (!response.ok) throw new Error('File not found');
+
+                const data = await response.json();
+
+                // Load content into editor
+                codeEditor.value = data.content;
+                currentFilename = filename;
+                filenameInput.value = filename;
+                isDirty = false;
+
+                // Update UI
+                updateCurrentFile();
+                updatePreview();
+                updateCharCount();
+                loadFileList(); // Refresh list to update active state
+
+                showMessage(`Opened: ${filename}`, 'success');
+            } catch (error) {
+                showMessage('Error opening file: ' + error.message, 'error');
+            }
+        }
+
+        /**
+         * Save current file to server
+         * Uses POST for new files, PUT for existing files
+         */
+        async function saveFile() {
+            const filename = filenameInput.value.trim();
+            const content = codeEditor.value;
+
+            // Validate filename
+            if (!filename) {
+                showMessage('Please enter a filename', 'error');
+                return;
+            }
+
+            try {
+                let response;
+
+                if (currentFilename === filename) {
+                    // UPDATE existing file (PUT request)
+                    response = await fetch(`/api/html-files/${filename}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ content })
+                    });
+                } else {
+                    // CREATE new file (POST request)
+                    response = await fetch('/api/html-files', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ filename, content })
+                    });
+                }
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Save failed');
+                }
+
+                currentFilename = filename;
+                isDirty = false;
+                updateCurrentFile();
+                loadFileList();
+
+                showMessage(`Saved: ${filename}`, 'success');
+            } catch (error) {
+                showMessage('Error saving file: ' + error.message, 'error');
+            }
+        }
+
+        /**
+         * Delete a file from the server
+         * Makes a DELETE request to /api/html-files/{filename}
+         */
+        async function deleteFile(filename) {
+            if (!confirm(`Are you sure you want to delete ${filename}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/html-files/${filename}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('Delete failed');
+
+                // If we deleted the current file, clear the editor
+                if (currentFilename === filename) {
+                    newFile();
+                }
+
+                loadFileList();
+                showMessage(`Deleted: ${filename}`, 'success');
+            } catch (error) {
+                showMessage('Error deleting file: ' + error.message, 'error');
+            }
+        }
+
+        /**
+         * Clear editor for a new file
+         */
+        function newFile() {
+            codeEditor.value = '';
+            filenameInput.value = '';
+            currentFilename = null;
+            isDirty = false;
+            updateCurrentFile();
+            updatePreview();
+            updateCharCount();
+            loadFileList();
+        }
+
+        // ============================================
+        // PREVIEW FUNCTIONS
+        // ============================================
+
+        /**
+         * Update the preview iframe with current HTML
+         * The iframe.srcdoc property renders HTML directly
+         */
+        function updatePreview() {
+            const htmlContent = codeEditor.value;
+            preview.srcdoc = htmlContent;
+        }
+
+        /**
+         * Open current file in a new browser tab
+         * Only works for saved files (served via /html_files/)
+         */
+        function viewInBrowser() {
+            if (!currentFilename) {
+                showMessage('Please save the file first', 'error');
+                return;
+            }
+            window.open(`/html_files/${currentFilename}`, '_blank');
+        }
+
+        // ============================================
+        // UI HELPER FUNCTIONS
+        // ============================================
+
+        /**
+         * Show editor panel on mobile/small screens
+         */
+        function showEditor() {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('editorPanel').style.display = 'flex';
+            document.getElementById('previewPanel').style.display = 'none';
+        }
+
+        /**
+         * Show preview panel on mobile/small screens
+         */
+        function showPreview() {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('editorPanel').style.display = 'none';
+            document.getElementById('previewPanel').style.display = 'flex';
+            updatePreview();
+        }
+
+        /**
+         * Update the status bar to show current filename
+         */
+        function updateCurrentFile() {
+            currentFileSpan.textContent = currentFilename || 'No file loaded';
+        }
+
+        /**
+         * Update character count in status bar
+         */
+        function updateCharCount() {
+            charCount.textContent = `${codeEditor.value.length} characters`;
+        }
+
+        /**
+         * Display a message to the user
+         * @param {string} text - Message text
+         * @param {string} type - 'success' or 'error'
+         */
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type} show`;
+
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                messageDiv.classList.remove('show');
+            }, 3000);
+        }
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+
+        // Add keyboard shortcuts for common actions
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+S or Cmd+S to save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveFile();
+            }
+            // Ctrl+P or Cmd+P to update preview
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                updatePreview();
+            }
+        });
+    </script>
+</body>
+</html>
