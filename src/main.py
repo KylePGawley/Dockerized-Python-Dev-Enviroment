@@ -63,3 +63,15 @@ def mark_complete(todo_id: int):
         "message": "Todo marked as complete",
         "id": todo_id
     }
+@app.delete("/todos/{todo_id}")
+def delete_todo(todo_id: int):
+    
+    if not r.exists(f"todo:{todo_id}"):
+        return {"error": "Todo not found"}
+    
+    r.delete(f"todo:{todo_id}")
+    
+    return {
+        "message": "Todo deleted successfully",
+        "id": todo_id
+    }
