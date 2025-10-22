@@ -3,7 +3,7 @@ import redis
 
 app = FastAPI()
 
-r = redis.Redis(host="redis", port=6379)
+r = redis.Redis(host="redis", port=6379, decode_responses=True)
 
 import debugpy
 debugpy.listen(("0.0.0.0", 5678))
