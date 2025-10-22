@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import redis
 import debugpy
-import pydantic import BaseModel
+from pydantic import BaseModel
 
 app = FastAPI()
 r = redis.Redis(host="redis", port=6379, decode_responses=True)
@@ -35,7 +35,8 @@ def get_all_todos():
 
 @app.post("/todos")
 def create_todo(todo: TodoCreate):
-     todo_id = r.incr("todo_counter")
+     
+    todo_id = r.incr("todo_counter")
     
     r.hset(
         f"todo:{todo_id}",
