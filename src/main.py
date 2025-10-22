@@ -8,7 +8,7 @@ from pydantic import BaseModel
 app = FastAPI()
 r = redis.Redis(host="redis", port=6379, decode_responses=True)
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 debugpy.listen(("0.0.0.0", 5678))
 
@@ -17,7 +17,7 @@ class TodoCreate(BaseModel):
 
 @app.get("/")
 def read_root():
-    return FileResponse("static/index.html")
+    return FileResponse("src/static/index.html")
 
 @app.get("/hits")
 def read_hits():
