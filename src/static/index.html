@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Todo List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+        }
+        .todo {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Todo List</h1>
+    
+    <!-- Add Todo Form -->
+    <div>
+        <input type="text" id="todoInput" placeholder="Enter a new todo">
+        <button onclick="addTodo()">Add Todo</button>
+    </div>
+    
+    <!-- Todo List -->
+    <div id="todoList"></div>
+
+    <script>
+        // Load todos when page loads
+        window.onload = function() {
+            loadTodos();
+        };
+
+        // Function to load all todos
+        async function loadTodos() {
+            const response = await fetch('/todos');
+            const data = await response.json();
+            
+            const todoList = document.getElementById('todoList');
+            todoList.innerHTML = '';
+            
+            data.todos.forEach(todo => {
+                const todoDiv = document.createElement('div');
+                todoDiv.className = 'todo';
+                if (todo.completed === 'true') {
+                    todoDiv.classList.add('completed');
+                }
+                
+                todoDiv.innerHTML = `
+                    <span>${todo.title}</span>
+                    <button onclick="completeTodo(${todo.id})">Complete</button>
+                    <button onclick="deleteTodo(${todo.id})">Delete</button>
+                `;
+                
+                todoList.appendChild(todoDiv);
+            });
+        }
+
+        // Function to add a new todo
+        async function addTodo() {
+            const input = document.getElementById('todoInput');
+            const title = input.value;
+            
+            if (!title) {
+                alert('Please enter a todo!');
+                return;
+            }
+            
+            await fetch('/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title: title })
+            });
+            
+            input.value = '';
+            loadTodos();
+        }
+
+        // Function to mark todo as complete
+        async function completeTodo(id) {
+            await fetch(`/todos/${id}/complete`, {
+                method: 'PUT'
+            });
+            loadTodos();
+        }
+
+        // Function to delete a todo
+        async function deleteTodo(id) {
+            await fetch(`/todos/${id}`, {
+                method: 'DELETE'
+            });
+            loadTodos();
+        }
+    </script>
+</body>
+</html>

@@ -2,9 +2,13 @@ from fastapi import FastAPI
 import redis
 import debugpy
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 app = FastAPI()
 r = redis.Redis(host="redis", port=6379, decode_responses=True)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 debugpy.listen(("0.0.0.0", 5678))
 
@@ -13,7 +17,7 @@ class TodoCreate(BaseModel):
 
 @app.get("/")
 def read_root():
-    return{"Hello": "Kyle"}
+    return FileResponse("static/index.html")
 
 @app.get("/hits")
 def read_hits():
