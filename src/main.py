@@ -16,3 +16,8 @@ def read_root():
 def read_hits():
     r.incr("hits")
     return{"Number of Hits": r.get("hits")}
+
+@app.get("/todos")
+def get_all_todos():
+    # Return list of todos
+    return {"todos": [...]}
