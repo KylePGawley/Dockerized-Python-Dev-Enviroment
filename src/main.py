@@ -19,5 +19,13 @@ def read_hits():
 
 @app.get("/todos")
 def get_all_todos():
-    # Return list of todos
-    return {"todos": [...]}
+    todos = []
+
+    keys = r.keys("todo:*")
+
+    for key in keys:
+        todo_data = r.hgetall(key)
+        todo_id = key.split(":")[1]
+        todo_data["id"] = todo_id
+        todos.append(todo_data)
+    return {"todos": todos}
