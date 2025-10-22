@@ -51,3 +51,15 @@ def create_todo(todo: TodoCreate):
         "id": todo_id,
         "title": todo.title
     }
+@app.put("/todos/{todo_id}/complete")
+def mark_complete(todo_id: int):
+
+    if not r.exists(f"todo:{todo_id}"):
+        return {"error": "Todo not found"}
+    
+    r.hset(f"todo:{todo_id}", "completed", "true")
+    
+    return {
+        "message": "Todo marked as complete",
+        "id": todo_id
+    }
