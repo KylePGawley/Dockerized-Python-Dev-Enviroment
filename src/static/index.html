@@ -1,109 +1,667 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Todo List</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevPlatform - Python Development Environment</title>
     <style>
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --dark: #1e1b4b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--darker);
+            line-height: 1.6;
+        }
+
+        /* ===== NAVIGATION ===== */
+        nav {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--darker);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: white;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.9;
             max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
+            margin: 0 auto;
         }
-        input, button {
-            padding: 10px;
-            margin: 5px;
+
+        /* ===== FEATURE CARDS ===== */
+        .features-section {
+            padding: 2rem 0;
+            animation: fadeIn 1.2s ease;
         }
-        .todo {
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+
+        .section-title {
+            color: white;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
-        .completed {
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--darker);
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        .feature-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        /* ===== TODO SECTION ===== */
+        .todo-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.4s ease;
+        }
+
+        .todo-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--darker);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .todo-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .todo-input-group input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .todo-input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .todo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .todo-item {
+            padding: 1.25rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .todo-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+        }
+
+        .todo-item.completed {
+            background: #f1f5f9;
+            opacity: 0.7;
+        }
+
+        .todo-item.completed .todo-text {
             text-decoration: line-through;
-            color: gray;
+            color: var(--gray);
         }
+
+        .todo-text {
+            flex: 1;
+            font-size: 1rem;
+            color: var(--darker);
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--gray);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        footer a:hover {
+            opacity: 0.8;
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            margin-top: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .github-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .todo-input-group {
+                flex-direction: column;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .todo-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .todo-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
     </style>
 </head>
 <body>
-    <h1>My Todo List</h1>
-    
-    <!-- Add Todo Form -->
-    <div>
-        <input type="text" id="todoInput" placeholder="Enter a new todo">
-        <button onclick="addTodo()">Add Todo</button>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🚀 DevPlatform</div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/editor">HTML Editor</a></li>
+                <li><a href="#docs">Docs</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Dockerized Python Dev Environment</h1>
+        <p>A modern, containerized development platform with powerful tools for building web applications</p>
+    </section>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Features Section -->
+        <section class="features-section">
+            <h2 class="section-title">Platform Features</h2>
+            <div class="features-grid">
+                <!-- HTML Editor Card -->
+                <a href="/editor" class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>HTML Editor</h3>
+                    <p>Build and edit HTML files with live preview. Create, save, and manage your web pages with a powerful code editor.</p>
+                    <span class="feature-badge">EXPLORE →</span>
+                </a>
+
+                <!-- Documentation Card -->
+                <a href="#docs" class="feature-card" onclick="showDocs(event)">
+                    <div class="feature-icon">📚</div>
+                    <h3>Documentation</h3>
+                    <p>Learn how to use the platform, understand the API, and explore development guides and best practices.</p>
+                    <span class="feature-badge">LEARN →</span>
+                </a>
+
+                <!-- API Card -->
+                <a href="/docs" class="feature-card" onclick="showAPI(event)">
+                    <div class="feature-icon">⚡</div>
+                    <h3>RESTful API</h3>
+                    <p>FastAPI-powered backend with automatic documentation, Redis persistence, and hot-reload for development.</p>
+                    <span class="feature-badge">VIEW API →</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Todo Section -->
+        <section class="todo-section">
+            <h2>
+                <span>✓</span>
+                My Todo List
+            </h2>
+
+            <!-- Add Todo Form -->
+            <div class="todo-input-group">
+                <input
+                    type="text"
+                    id="todoInput"
+                    placeholder="What needs to be done?"
+                    onkeypress="if(event.key === 'Enter') addTodo()"
+                >
+                <button class="btn btn-primary" onclick="addTodo()">Add Todo</button>
+            </div>
+
+            <!-- Todo List -->
+            <div id="todoList" class="todo-list">
+                <!-- Todos will be loaded here -->
+            </div>
+        </section>
     </div>
-    
-    <!-- Todo List -->
-    <div id="todoList"></div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Built with FastAPI, Redis, and Docker</p>
+        <a href="https://github.com/KylePGawley" target="_blank" class="github-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            Created by Kyle Gawley
+        </a>
+    </footer>
 
     <script>
+        // ========================================
+        // TODO LIST FUNCTIONALITY
+        // ========================================
+
         // Load todos when page loads
         window.onload = function() {
             loadTodos();
         };
 
-        // Function to load all todos
+        /**
+         * Load all todos from the API
+         */
         async function loadTodos() {
-            const response = await fetch('/todos');
-            const data = await response.json();
-            
-            const todoList = document.getElementById('todoList');
-            todoList.innerHTML = '';
-            
-            data.todos.forEach(todo => {
-                const todoDiv = document.createElement('div');
-                todoDiv.className = 'todo';
-                if (todo.completed === 'true') {
-                    todoDiv.classList.add('completed');
+            try {
+                const response = await fetch('/todos');
+                const data = await response.json();
+
+                const todoList = document.getElementById('todoList');
+
+                // If no todos, show empty state
+                if (data.todos.length === 0) {
+                    todoList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <p>No todos yet. Add one above to get started!</p>
+                        </div>
+                    `;
+                    return;
                 }
-                
-                todoDiv.innerHTML = `
-                    <span>${todo.title}</span>
-                    <button onclick="completeTodo(${todo.id})">Complete</button>
-                    <button onclick="deleteTodo(${todo.id})">Delete</button>
-                `;
-                
-                todoList.appendChild(todoDiv);
-            });
+
+                // Clear and rebuild list
+                todoList.innerHTML = '';
+
+                data.todos.forEach(todo => {
+                    const todoDiv = document.createElement('div');
+                    todoDiv.className = 'todo-item';
+                    if (todo.completed === 'true') {
+                        todoDiv.classList.add('completed');
+                    }
+
+                    todoDiv.innerHTML = `
+                        <span class="todo-text">${escapeHtml(todo.title)}</span>
+                        <div class="todo-actions">
+                            ${todo.completed !== 'true' ?
+                                `<button class="btn btn-success" onclick="completeTodo(${todo.id})">Complete</button>` :
+                                ''}
+                            <button class="btn btn-danger" onclick="deleteTodo(${todo.id})">Delete</button>
+                        </div>
+                    `;
+
+                    todoList.appendChild(todoDiv);
+                });
+            } catch (error) {
+                console.error('Error loading todos:', error);
+            }
         }
 
-        // Function to add a new todo
+        /**
+         * Add a new todo
+         */
         async function addTodo() {
             const input = document.getElementById('todoInput');
-            const title = input.value;
-            
+            const title = input.value.trim();
+
             if (!title) {
                 alert('Please enter a todo!');
                 return;
             }
-            
-            await fetch('/todos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ title: title })
-            });
-            
-            input.value = '';
-            loadTodos();
+
+            try {
+                await fetch('/todos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title: title })
+                });
+
+                input.value = '';
+                loadTodos();
+            } catch (error) {
+                console.error('Error adding todo:', error);
+                alert('Failed to add todo');
+            }
         }
 
-        // Function to mark todo as complete
+        /**
+         * Mark todo as complete
+         */
         async function completeTodo(id) {
-            await fetch(`/todos/${id}/complete`, {
-                method: 'PUT'
-            });
-            loadTodos();
+            try {
+                await fetch(`/todos/${id}/complete`, {
+                    method: 'PUT'
+                });
+                loadTodos();
+            } catch (error) {
+                console.error('Error completing todo:', error);
+                alert('Failed to complete todo');
+            }
         }
 
-        // Function to delete a todo
+        /**
+         * Delete a todo
+         */
         async function deleteTodo(id) {
-            await fetch(`/todos/${id}`, {
-                method: 'DELETE'
-            });
-            loadTodos();
+            if (!confirm('Are you sure you want to delete this todo?')) {
+                return;
+            }
+
+            try {
+                await fetch(`/todos/${id}`, {
+                    method: 'DELETE'
+                });
+                loadTodos();
+            } catch (error) {
+                console.error('Error deleting todo:', error);
+                alert('Failed to delete todo');
+            }
+        }
+
+        /**
+         * Escape HTML to prevent XSS attacks
+         */
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ========================================
+        // NAVIGATION FUNCTIONALITY
+        // ========================================
+
+        /**
+         * Show documentation (placeholder)
+         */
+        function showDocs(event) {
+            event.preventDefault();
+            alert('📚 Documentation\n\nThis platform includes:\n\n• FastAPI Backend\n• Redis Persistence\n• Docker Containerization\n• HTML Editor\n• Todo List Manager\n\nVisit /docs for API documentation!');
+        }
+
+        /**
+         * Show API documentation
+         */
+        function showAPI(event) {
+            event.preventDefault();
+            window.open('/docs', '_blank');
         }
     </script>
 </body>
