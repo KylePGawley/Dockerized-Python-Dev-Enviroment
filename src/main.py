@@ -13,6 +13,6 @@ def read_root():
     return{"Hello": "Kyle"}
 
 @app.get("/hits")
-def read_root():
+def read_hits():
     r.incr("hits")
     return{"Number of Hits": r.get("hits")}
