@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevPlatform - Python Development Environment</title>
+    <title>Gawly - Cutting-Edge Development Platform</title>
     <style>
         /* ===== RESET & BASE STYLES ===== */
         * {
@@ -13,32 +13,63 @@
         }
 
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #8b5cf6;
-            --accent: #ec4899;
-            --dark: #1e1b4b;
-            --darker: #0f172a;
-            --light: #f8fafc;
-            --gray: #64748b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
+            /* Dark Futuristic Color Scheme */
+            --neon-cyan: #00f0ff;
+            --neon-blue: #0ff;
+            --electric-blue: #00d4ff;
+            --neon-green: #00ff41;
+            --neon-red: #ff0055;
+            --neon-purple: #b026ff;
+
+            /* Backgrounds */
+            --bg-primary: #0a0e27;
+            --bg-secondary: #0f1729;
+            --bg-card: #161b2e;
+            --bg-card-hover: #1a2035;
+
+            /* Text */
+            --text-primary: #e0e7ff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            /* Borders */
+            --border-color: #1e293b;
+            --border-glow: rgba(0, 240, 255, 0.3);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            background-image:
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
             min-height: 100vh;
-            color: var(--darker);
+            color: var(--text-primary);
             line-height: 1.6;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at top, rgba(0, 240, 255, 0.15), transparent 50%),
+                        radial-gradient(ellipse at bottom, rgba(0, 212, 255, 0.1), transparent 50%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         /* ===== NAVIGATION ===== */
         nav {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: rgba(22, 27, 46, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5),
+                        0 0 20px rgba(0, 240, 255, 0.1);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -63,15 +94,30 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            z-index: 1;
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.8),
+                         0 0 40px rgba(0, 240, 255, 0.4);
+            letter-spacing: 0.1em;
+            font-family: 'SF Mono', monospace;
+            position: relative;
+        }
+
+        .logo::before {
+            content: '▸ ';
+            color: var(--neon-green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .nav-links {
@@ -82,24 +128,30 @@
 
         .nav-links a {
             text-decoration: none;
-            color: var(--darker);
+            color: var(--text-secondary);
             font-weight: 500;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
             position: relative;
+            padding: 0.5rem 0;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
         }
 
         .nav-links a:hover {
-            color: var(--primary);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
         }
 
         .nav-links a::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: 0;
             left: 0;
             width: 0;
             height: 2px;
-            background: var(--primary);
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
             transition: width 0.3s ease;
         }
 
@@ -112,13 +164,15 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
+            position: relative;
+            z-index: 1;
         }
 
         /* ===== HERO SECTION ===== */
         .hero {
             text-align: center;
-            padding: 4rem 2rem;
-            color: white;
+            padding: 5rem 2rem 4rem;
+            position: relative;
             animation: fadeIn 1s ease;
         }
 
@@ -128,16 +182,36 @@
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, var(--neon-cyan), var(--electric-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            position: relative;
+        }
+
+        .hero h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 20px var(--neon-cyan);
         }
 
         .hero p {
-            font-size: 1.25rem;
-            opacity: 0.9;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
             max-width: 600px;
-            margin: 0 auto;
+            margin: 2rem auto 0;
+            line-height: 1.8;
         }
 
         /* ===== FEATURE CARDS ===== */
@@ -147,11 +221,13 @@
         }
 
         .section-title {
-            color: white;
+            color: var(--text-primary);
             font-size: 2rem;
             text-align: center;
-            margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
 
         .features-grid {
@@ -162,65 +238,109 @@
         }
 
         .feature-card {
-            background: white;
-            border-radius: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
             padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
             cursor: pointer;
             text-decoration: none;
             color: inherit;
             display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--electric-blue));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
         }
 
         .feature-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--border-glow);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6),
+                        0 0 40px rgba(0, 240, 255, 0.2);
+            background: var(--bg-card-hover);
         }
 
         .feature-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
+            filter: drop-shadow(0 0 10px currentColor);
         }
 
         .feature-card h3 {
             font-size: 1.5rem;
             margin-bottom: 0.5rem;
-            color: var(--darker);
+            color: var(--neon-cyan);
+            font-weight: 700;
         }
 
         .feature-card p {
-            color: var(--gray);
-            line-height: 1.6;
+            color: var(--text-secondary);
+            line-height: 1.7;
         }
 
         .feature-badge {
             display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background: var(--primary);
-            color: white;
+            padding: 0.4rem 1rem;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 600;
             margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
         }
 
         /* ===== TODO SECTION ===== */
         .todo-section {
-            background: white;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             animation: fadeIn 1.4s ease;
+            position: relative;
+        }
+
+        .todo-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+            border-radius: 16px 16px 0 0;
         }
 
         .todo-section h2 {
             font-size: 2rem;
             margin-bottom: 1.5rem;
-            color: var(--darker);
+            color: var(--neon-cyan);
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .todo-input-group {
@@ -232,15 +352,24 @@
         .todo-input-group input {
             flex: 1;
             padding: 1rem;
-            border: 2px solid #e2e8f0;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            font-family: inherit;
         }
 
         .todo-input-group input:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            background: var(--bg-card);
+        }
+
+        .todo-input-group input::placeholder {
+            color: var(--text-muted);
         }
 
         .btn {
@@ -251,38 +380,51 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: inherit;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+            background: var(--neon-cyan);
+            color: var(--bg-primary);
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.6),
+                        0 4px 20px rgba(0, 0, 0, 0.4);
+            background: var(--electric-blue);
         }
 
         .btn-success {
-            background: var(--success);
-            color: white;
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
             padding: 0.5rem 1rem;
             font-size: 0.875rem;
         }
 
         .btn-success:hover {
-            background: #059669;
+            background: var(--neon-green);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
         }
 
         .btn-danger {
-            background: var(--danger);
-            color: white;
+            background: rgba(255, 0, 85, 0.1);
+            color: var(--neon-red);
+            border: 1px solid var(--neon-red);
             padding: 0.5rem 1rem;
             font-size: 0.875rem;
         }
 
         .btn-danger:hover {
-            background: #dc2626;
+            background: var(--neon-red);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
         }
 
         .todo-list {
@@ -293,13 +435,27 @@
 
         .todo-item {
             padding: 1.25rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: all 0.3s ease;
             animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        .todo-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--neon-cyan);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         @keyframes slideIn {
@@ -314,24 +470,30 @@
         }
 
         .todo-item:hover {
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+            border-color: var(--border-glow);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3),
+                        0 0 20px rgba(0, 240, 255, 0.1);
+            background: var(--bg-card);
+        }
+
+        .todo-item:hover::before {
+            opacity: 1;
         }
 
         .todo-item.completed {
-            background: #f1f5f9;
-            opacity: 0.7;
+            opacity: 0.5;
+            background: var(--bg-primary);
         }
 
         .todo-item.completed .todo-text {
             text-decoration: line-through;
-            color: var(--gray);
+            color: var(--text-muted);
         }
 
         .todo-text {
             flex: 1;
             font-size: 1rem;
-            color: var(--darker);
+            color: var(--text-primary);
         }
 
         .todo-actions {
@@ -342,37 +504,41 @@
         .empty-state {
             text-align: center;
             padding: 3rem 2rem;
-            color: var(--gray);
+            color: var(--text-muted);
         }
 
         .empty-state-icon {
             font-size: 4rem;
             margin-bottom: 1rem;
             opacity: 0.3;
+            filter: grayscale(1);
         }
 
         /* ===== FOOTER ===== */
         footer {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(22, 27, 46, 0.5);
             backdrop-filter: blur(10px);
-            color: white;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
             text-align: center;
             padding: 2rem;
             margin-top: 4rem;
+            position: relative;
+            z-index: 1;
         }
 
         footer a {
-            color: white;
+            color: var(--neon-cyan);
             text-decoration: none;
             font-weight: 600;
-            transition: opacity 0.3s ease;
+            transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
         }
 
         footer a:hover {
-            opacity: 0.8;
+            text-shadow: 0 0 10px var(--neon-cyan);
         }
 
         .github-link {
@@ -380,24 +546,31 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
             border-radius: 8px;
             margin-top: 1rem;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .github-link:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(0, 240, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            transform: translateY(-2px);
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .hero h1 {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
 
             .nav-links {
                 gap: 1rem;
+            }
+
+            .nav-links a {
+                font-size: 0.75rem;
             }
 
             .todo-input-group {
@@ -420,18 +593,32 @@
             }
         }
 
-        /* ===== UTILITY CLASSES ===== */
-        .mt-1 { margin-top: 0.5rem; }
-        .mt-2 { margin-top: 1rem; }
-        .mt-3 { margin-top: 1.5rem; }
-        .mt-4 { margin-top: 2rem; }
+        /* ===== SCANLINE EFFECT ===== */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(transparent, rgba(0, 240, 255, 0.5), transparent);
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.3;
+        }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
-            <div class="logo">🚀 DevPlatform</div>
+            <div class="logo">GAWLY</div>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
                 <li><a href="/editor">HTML Editor</a></li>
@@ -443,7 +630,7 @@
     <!-- Hero Section -->
     <section class="hero">
         <h1>Dockerized Python Dev Environment</h1>
-        <p>A modern, containerized development platform with powerful tools for building web applications</p>
+        <p>A cutting-edge, containerized development platform engineered for the future of web applications</p>
     </section>
 
     <!-- Main Container -->
@@ -482,7 +669,7 @@
         <section class="todo-section">
             <h2>
                 <span>✓</span>
-                My Todo List
+                Task Queue
             </h2>
 
             <!-- Add Todo Form -->
@@ -493,7 +680,7 @@
                     placeholder="What needs to be done?"
                     onkeypress="if(event.key === 'Enter') addTodo()"
                 >
-                <button class="btn btn-primary" onclick="addTodo()">Add Todo</button>
+                <button class="btn btn-primary" onclick="addTodo()">Add Task</button>
             </div>
 
             <!-- Todo List -->
@@ -539,7 +726,7 @@
                     todoList.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-state-icon">📋</div>
-                            <p>No todos yet. Add one above to get started!</p>
+                            <p>No tasks queued. Add one above to get started!</p>
                         </div>
                     `;
                     return;
@@ -580,7 +767,7 @@
             const title = input.value.trim();
 
             if (!title) {
-                alert('Please enter a todo!');
+                alert('Please enter a task!');
                 return;
             }
 
@@ -597,7 +784,7 @@
                 loadTodos();
             } catch (error) {
                 console.error('Error adding todo:', error);
-                alert('Failed to add todo');
+                alert('Failed to add task');
             }
         }
 
@@ -612,7 +799,7 @@
                 loadTodos();
             } catch (error) {
                 console.error('Error completing todo:', error);
-                alert('Failed to complete todo');
+                alert('Failed to complete task');
             }
         }
 
@@ -620,7 +807,7 @@
          * Delete a todo
          */
         async function deleteTodo(id) {
-            if (!confirm('Are you sure you want to delete this todo?')) {
+            if (!confirm('Are you sure you want to delete this task?')) {
                 return;
             }
 
@@ -631,7 +818,7 @@
                 loadTodos();
             } catch (error) {
                 console.error('Error deleting todo:', error);
-                alert('Failed to delete todo');
+                alert('Failed to delete task');
             }
         }
 
@@ -653,7 +840,7 @@
          */
         function showDocs(event) {
             event.preventDefault();
-            alert('📚 Documentation\n\nThis platform includes:\n\n• FastAPI Backend\n• Redis Persistence\n• Docker Containerization\n• HTML Editor\n• Todo List Manager\n\nVisit /docs for API documentation!');
+            alert('📚 Documentation\n\nThis platform includes:\n\n• FastAPI Backend\n• Redis Persistence\n• Docker Containerization\n• HTML Editor\n• Task Queue Manager\n\nVisit /docs for API documentation!');
         }
 
         /**
