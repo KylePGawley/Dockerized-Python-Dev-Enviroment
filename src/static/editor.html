@@ -258,22 +258,9 @@
             border-right: 2px solid var(--border);
         }
 
-        #codeEditor {
+        #editor {
             flex: 1;
-            width: 100%;
-            padding: 1rem;
-            border: none;
-            background: var(--bg-darker);
-            color: var(--green);
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            resize: none;
-            outline: none;
-        }
-
-        #codeEditor::placeholder {
-            color: var(--text-dim);
+            min-height: 0;
         }
 
         /* Preview panel */
@@ -427,18 +414,7 @@
             <!-- Split view with editor and preview -->
             <div class="split-view">
                 <div class="editor-panel" id="editorPanel">
-                    <textarea id="codeEditor" placeholder="Start typing your HTML here...
-
-Example:
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Page</title>
-</head>
-<body>
-    <h1>Hello, World!</h1>
-</body>
-</html>"></textarea>
+                    <div id="editor"></div>
                 </div>
                 <div class="preview-panel" id="previewPanel">
                     <iframe id="preview"></iframe>
@@ -453,16 +429,18 @@ Example:
         </main>
     </div>
 
+    <!-- Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
     <script>
         // ============================================
         // STATE MANAGEMENT
         // ============================================
 
+        let editor;
         let currentFilename = null;  // Track currently open file
         let isDirty = false;         // Track if file has unsaved changes
 
         // Get references to DOM elements
-        const codeEditor = document.getElementById('codeEditor');
         const preview = document.getElementById('preview');
         const filenameInput = document.getElementById('filenameInput');
         const fileList = document.getElementById('fileList');
@@ -471,18 +449,74 @@ Example:
         const messageDiv = document.getElementById('message');
 
         // ============================================
-        // INITIALIZATION
+        // MONACO EDITOR INITIALIZATION
         // ============================================
 
-        // Load file list when page loads
-        window.addEventListener('DOMContentLoaded', () => {
-            loadFileList();
-            // Update character count as user types
-            codeEditor.addEventListener('input', () => {
+        // Load Monaco Editor
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+
+        require(['vs/editor/editor.main'], function() {
+            // Initialize Monaco Editor with dark theme
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+    <p>Welcome to the HTML Editor.</p>
+</body>
+</html>`,
+                language: 'html',
+                theme: 'vs-dark',
+                fontSize: 14,
+                fontFamily: 'Consolas, "Courier New", monospace',
+                minimap: { enabled: true },
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                lineNumbers: 'on',
+                renderLineHighlight: 'all',
+                quickSuggestions: true,
+                suggestOnTriggerCharacters: true,
+                wordBasedSuggestions: true,
+                tabSize: 2,
+                insertSpaces: true,
+                autoIndent: 'full',
+                formatOnPaste: true,
+                formatOnType: true,
+                autoClosingBrackets: 'always',
+                autoClosingQuotes: 'always',
+                bracketPairColorization: { enabled: true },
+            });
+
+            // Track changes for dirty state and character count
+            editor.onDidChangeModelContent(() => {
                 isDirty = true;
                 updateCharCount();
             });
-            // Initial preview
+
+            // Add keyboard shortcuts
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function() {
+                saveFile();
+            });
+
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyP, function() {
+                updatePreview();
+            });
+
+            // Load files after editor is initialized
+            loadFileList();
             updatePreview();
         });
 
@@ -549,7 +583,7 @@ Example:
                 const data = await response.json();
 
                 // Load content into editor
-                codeEditor.value = data.content;
+                editor.setValue(data.content);
                 currentFilename = filename;
                 filenameInput.value = filename;
                 isDirty = false;
@@ -572,7 +606,7 @@ Example:
          */
         async function saveFile() {
             const filename = filenameInput.value.trim();
-            const content = codeEditor.value;
+            const content = editor.getValue();
 
             // Validate filename
             if (!filename) {
@@ -651,7 +685,7 @@ Example:
          * Clear editor for a new file
          */
         function newFile() {
-            codeEditor.value = '';
+            editor.setValue('');
             filenameInput.value = '';
             currentFilename = null;
             isDirty = false;
@@ -670,7 +704,8 @@ Example:
          * The iframe.srcdoc property renders HTML directly
          */
         function updatePreview() {
-            const htmlContent = codeEditor.value;
+            if (!editor) return;
+            const htmlContent = editor.getValue();
             preview.srcdoc = htmlContent;
         }
 
@@ -722,7 +757,8 @@ Example:
          * Update character count in status bar
          */
         function updateCharCount() {
-            charCount.textContent = `${codeEditor.value.length} characters`;
+            if (!editor) return;
+            charCount.textContent = `${editor.getValue().length} characters`;
         }
 
         /**
@@ -739,24 +775,6 @@ Example:
                 messageDiv.classList.remove('show');
             }, 3000);
         }
-
-        // ============================================
-        // KEYBOARD SHORTCUTS
-        // ============================================
-
-        // Add keyboard shortcuts for common actions
-        document.addEventListener('keydown', (e) => {
-            // Ctrl+S or Cmd+S to save
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                saveFile();
-            }
-            // Ctrl+P or Cmd+P to update preview
-            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-                e.preventDefault();
-                updatePreview();
-            }
-        });
     </script>
 </body>
 </html>
