@@ -215,22 +215,9 @@
             letter-spacing: 1px;
         }
 
-        .code-editor {
+        #editor {
             flex: 1;
-            width: 100%;
-            background: var(--bg-darker);
-            color: var(--green);
-            border: none;
-            padding: 1rem;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            resize: none;
-            outline: none;
-            line-height: 1.5;
-        }
-
-        .code-editor::placeholder {
-            color: var(--text-dim);
+            min-height: 0;
         }
 
         .output-console {
@@ -379,22 +366,7 @@
                     <!-- Code Panel -->
                     <div class="panel">
                         <div class="panel-header">Python Code Editor</div>
-                        <textarea
-                            id="codeEditor"
-                            class="code-editor"
-                            placeholder="# Write your Python code here...
-# Example:
-print('Hello, World!')
-
-# Try some calculations
-result = 2 + 2
-print(f'2 + 2 = {result}')
-
-# Use loops
-for i in range(5):
-    print(f'Count: {i}')
-"
-                        ></textarea>
+                        <div id="editor"></div>
                     </div>
 
                     <!-- Output Panel -->
@@ -410,27 +382,60 @@ for i in range(5):
         </div>
     </div>
 
+    <!-- Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
     <script>
-        // Global variables
+        let editor;
         let currentFilename = 'script.py';
 
-        // Load files on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFiles();
+        // Load Monaco Editor
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
 
-            // Keyboard shortcuts
-            document.getElementById('codeEditor').addEventListener('keydown', function(e) {
-                // Ctrl+Enter to run
-                if (e.ctrlKey && e.key === 'Enter') {
-                    e.preventDefault();
-                    runCode();
-                }
-                // Ctrl+S to save
-                if (e.ctrlKey && e.key === 's') {
-                    e.preventDefault();
-                    saveFile();
-                }
+        require(['vs/editor/editor.main'], function() {
+            // Initialize Monaco Editor with dark theme
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: `# Write your Python code here...
+# Example:
+print('Hello, World!')
+
+# Try some calculations
+result = 2 + 2
+print(f'2 + 2 = {result}')
+
+# Use loops
+for i in range(5):
+    print(f'Count: {i}')
+`,
+                language: 'python',
+                theme: 'vs-dark',
+                fontSize: 14,
+                fontFamily: 'Consolas, "Courier New", monospace',
+                minimap: { enabled: true },
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                lineNumbers: 'on',
+                renderLineHighlight: 'all',
+                quickSuggestions: true,
+                suggestOnTriggerCharacters: true,
+                wordBasedSuggestions: true,
+                tabSize: 4,
+                insertSpaces: true,
+                autoIndent: 'full',
+                formatOnPaste: true,
+                formatOnType: true,
             });
+
+            // Add keyboard shortcuts
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, function() {
+                runCode();
+            });
+
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function() {
+                saveFile();
+            });
+
+            // Load files after editor is initialized
+            loadFiles();
         });
 
         // Load saved files
@@ -468,7 +473,7 @@ for i in range(5):
                 const response = await fetch(`/api/python-files/${filename}`);
                 const data = await response.json();
 
-                document.getElementById('codeEditor').value = data.content;
+                editor.setValue(data.content);
                 document.getElementById('filenameInput').value = filename;
                 currentFilename = filename;
 
@@ -482,7 +487,7 @@ for i in range(5):
         // Save file
         async function saveFile() {
             const filename = document.getElementById('filenameInput').value.trim();
-            const content = document.getElementById('codeEditor').value;
+            const content = editor.getValue();
 
             if (!filename) {
                 showMessage('Please enter a filename', 'error');
@@ -538,7 +543,7 @@ for i in range(5):
                     loadFiles();
 
                     if (currentFilename === filename) {
-                        document.getElementById('codeEditor').value = '';
+                        editor.setValue('');
                         document.getElementById('filenameInput').value = 'script.py';
                         clearOutput();
                     }
@@ -553,7 +558,7 @@ for i in range(5):
 
         // Run Python code
         async function runCode() {
-            const code = document.getElementById('codeEditor').value;
+            const code = editor.getValue();
             const outputConsole = document.getElementById('outputConsole');
 
             if (!code.trim()) {
