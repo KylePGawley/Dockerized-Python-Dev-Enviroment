@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Editor</title>
+    <title>HTML Editor - Gawly Platform</title>
     <style>
         /* Reset and base styles */
         * {
@@ -12,57 +12,89 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-dark: #0a0e27;
+            --bg-darker: #060920;
+            --bg-card: #151932;
+            --cyan: #00ffff;
+            --green: #00ff41;
+            --purple: #b624ff;
+            --red: #ff2e63;
+            --text: #e0e0e0;
+            --text-dim: #a0a0a0;
+            --border: rgba(0, 255, 255, 0.3);
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+            color: var(--text);
+            overflow: hidden;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            background: #f5f5f5;
         }
 
         /* Header with title and controls */
         header {
-            background: #2c3e50;
-            color: white;
-            padding: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: rgba(21, 25, 50, 0.95);
+            border-bottom: 2px solid var(--cyan);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
         }
 
         h1 {
             font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+            color: var(--cyan);
+            text-shadow: 0 0 10px var(--cyan);
+            margin-bottom: 0.75rem;
         }
 
         /* Control buttons */
         .controls {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .controls input {
             flex: 1;
             min-width: 200px;
             padding: 0.5rem;
-            border: none;
-            border-radius: 4px;
+            background: var(--bg-darker);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Courier New', monospace;
             font-size: 0.9rem;
+            border-radius: 4px;
+        }
+
+        .controls input:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
         }
 
         button {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 4px;
-            background: #3498db;
-            color: white;
+            padding: 0.5rem 1.5rem;
+            border: 2px solid var(--cyan);
+            background: transparent;
+            color: var(--cyan);
             cursor: pointer;
+            font-family: 'Courier New', monospace;
             font-size: 0.9rem;
-            font-weight: 500;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
         }
 
         button:hover {
-            background: #2980b9;
+            background: var(--cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--cyan);
+            transform: translateY(-2px);
         }
 
         button:active {
@@ -70,19 +102,38 @@
         }
 
         button.danger {
-            background: #e74c3c;
+            border-color: var(--red);
+            color: var(--red);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
         }
 
         button.danger:hover {
-            background: #c0392b;
+            background: var(--red);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--red);
         }
 
         button.success {
-            background: #27ae60;
+            border-color: var(--green);
+            color: var(--green);
         }
 
         button.success:hover {
-            background: #229954;
+            background: var(--green);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--green);
+        }
+
+        button.back {
+            border-color: var(--purple);
+            color: var(--purple);
+        }
+
+        button.back:hover {
+            background: var(--purple);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--purple);
         }
 
         /* Main container with sidebar and editor */
@@ -95,8 +146,8 @@
         /* Sidebar with file list */
         .sidebar {
             width: 250px;
-            background: white;
-            border-right: 1px solid #ddd;
+            background: var(--bg-card);
+            border-right: 2px solid var(--border);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -104,44 +155,53 @@
 
         .sidebar h2 {
             padding: 1rem;
-            background: #34495e;
-            color: white;
+            background: rgba(0, 255, 255, 0.1);
+            color: var(--cyan);
             font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         #fileList {
             flex: 1;
             overflow-y: auto;
             list-style: none;
+            padding: 0.5rem;
         }
 
         #fileList li {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #eee;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 4px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         #fileList li:hover {
-            background: #ecf0f1;
+            background: rgba(0, 255, 255, 0.15);
+            border-color: var(--cyan);
+            transform: translateX(5px);
         }
 
         #fileList li.active {
-            background: #3498db;
-            color: white;
+            background: rgba(0, 255, 255, 0.25);
+            border-color: var(--cyan);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        #fileList li span {
+            color: var(--text);
+            font-size: 0.9rem;
         }
 
         .file-actions {
             display: flex;
             gap: 0.25rem;
-        }
-
-        .file-actions button {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
         }
 
         /* Editor and preview split view */
@@ -153,24 +213,34 @@
 
         .editor-tabs {
             display: flex;
-            background: #34495e;
+            background: rgba(21, 25, 50, 0.8);
             padding: 0.5rem 1rem;
             gap: 1rem;
+            border-bottom: 1px solid var(--border);
         }
 
         .tab {
             padding: 0.5rem 1rem;
             background: transparent;
-            color: #bdc3c7;
+            color: var(--text-dim);
             border: none;
             cursor: pointer;
             border-bottom: 2px solid transparent;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .tab:hover {
+            color: var(--cyan);
         }
 
         .tab.active {
-            color: white;
-            border-bottom-color: #3498db;
+            color: var(--cyan);
+            border-bottom-color: var(--cyan);
+            text-shadow: 0 0 10px var(--cyan);
         }
 
         .split-view {
@@ -184,8 +254,8 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: white;
-            border-right: 1px solid #ddd;
+            background: var(--bg-card);
+            border-right: 2px solid var(--border);
         }
 
         #codeEditor {
@@ -193,11 +263,17 @@
             width: 100%;
             padding: 1rem;
             border: none;
-            font-family: 'Courier New', Courier, monospace;
+            background: var(--bg-darker);
+            color: var(--green);
+            font-family: 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.5;
             resize: none;
             outline: none;
+        }
+
+        #codeEditor::placeholder {
+            color: var(--text-dim);
         }
 
         /* Preview panel */
@@ -205,7 +281,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: white;
+            background: var(--bg-card);
         }
 
         #preview {
@@ -217,49 +293,115 @@
 
         /* Status bar */
         .status-bar {
-            padding: 0.5rem 1rem;
-            background: #34495e;
-            color: white;
+            padding: 0.75rem 1rem;
+            background: rgba(21, 25, 50, 0.95);
+            color: var(--text);
             font-size: 0.85rem;
             display: flex;
             justify-content: space-between;
+            border-top: 1px solid var(--border);
+        }
+
+        #currentFile {
+            color: var(--cyan);
+        }
+
+        #charCount {
+            color: var(--text-dim);
         }
 
         /* Message display */
         .message {
-            padding: 0.75rem 1rem;
-            margin: 0.5rem 1rem;
-            border-radius: 4px;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
             display: none;
         }
 
         .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: rgba(0, 255, 65, 0.2);
+            border: 2px solid var(--green);
+            color: var(--green);
         }
 
         .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: rgba(255, 46, 99, 0.2);
+            border: 2px solid var(--red);
+            color: var(--red);
         }
 
         .message.show {
             display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--cyan);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00cccc;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .split-view {
+                flex-direction: column;
+            }
+
+            .editor-panel,
+            .preview-panel {
+                display: none;
+            }
+
+            .tab.active + .editor-panel,
+            .tab.active + .preview-panel {
+                display: flex;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Header with title and main controls -->
     <header>
-        <h1>HTML Editor</h1>
+        <h1>📝 HTML Editor</h1>
         <div class="controls">
             <input type="text" id="filenameInput" placeholder="Enter filename (e.g., mypage.html)">
             <button onclick="newFile()">New</button>
-            <button onclick="saveFile()" class="success">Save</button>
-            <button onclick="updatePreview()">Preview</button>
-            <button onclick="viewInBrowser()" class="success">View in Browser</button>
+            <button onclick="saveFile()" class="success">💾 Save</button>
+            <button onclick="updatePreview()">👁️ Preview</button>
+            <button onclick="viewInBrowser()" class="success">🌐 View</button>
+            <button onclick="window.location.href='/'" class="back">← Back</button>
         </div>
     </header>
 
@@ -270,7 +412,7 @@
     <div class="container">
         <!-- Sidebar with file list -->
         <aside class="sidebar">
-            <h2>Saved Files</h2>
+            <h2>📁 Saved Files</h2>
             <ul id="fileList"></ul>
         </aside>
 
@@ -285,7 +427,18 @@
             <!-- Split view with editor and preview -->
             <div class="split-view">
                 <div class="editor-panel" id="editorPanel">
-                    <textarea id="codeEditor" placeholder="Start typing your HTML here..."></textarea>
+                    <textarea id="codeEditor" placeholder="Start typing your HTML here...
+
+Example:
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Page</title>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+</body>
+</html>"></textarea>
                 </div>
                 <div class="preview-panel" id="previewPanel">
                     <iframe id="preview"></iframe>
@@ -349,6 +502,11 @@
                 // Clear existing list
                 fileList.innerHTML = '';
 
+                if (data.files.length === 0) {
+                    fileList.innerHTML = '<li style="color: var(--text-dim); padding: 1rem; border: none;">No saved files</li>';
+                    return;
+                }
+
                 // Create list item for each file
                 data.files.forEach(file => {
                     const li = document.createElement('li');
@@ -362,7 +520,7 @@
                     actions.className = 'file-actions';
 
                     const deleteBtn = document.createElement('button');
-                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.textContent = '🗑️';
                     deleteBtn.className = 'danger';
                     deleteBtn.onclick = (e) => {
                         e.stopPropagation();
