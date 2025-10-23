@@ -6,6 +6,8 @@ import debugpy
 from pydantic import BaseModel
 import os
 from pathlib import Path
+import subprocess
+import sys
 
 app = FastAPI()
 r = redis.Redis(host="redis", port=6379, decode_responses=True)
@@ -13,6 +15,10 @@ r = redis.Redis(host="redis", port=6379, decode_responses=True)
 # Create directory for HTML files if it doesn't exist
 HTML_FILES_DIR = Path("src/html_files")
 HTML_FILES_DIR.mkdir(exist_ok=True)
+
+# Create directory for Python files if it doesn't exist
+PYTHON_FILES_DIR = Path("src/python_files")
+PYTHON_FILES_DIR.mkdir(exist_ok=True)
 
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 # Mount html_files directory so we can view them in browser
@@ -29,6 +35,13 @@ class HTMLFileCreate(BaseModel):
 
 class HTMLFileUpdate(BaseModel):
     content: str
+
+class PythonFileCreate(BaseModel):
+    filename: str
+    content: str
+
+class PythonCodeExecute(BaseModel):
+    code: str
 
 @app.get("/")
 def read_root():
@@ -193,6 +206,119 @@ def delete_html_file(filename: str):
         raise HTTPException(status_code=400, detail="Invalid filename")
 
     file_path = HTML_FILES_DIR / filename
+
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+
+    try:
+        file_path.unlink()
+        return {
+            "message": "File deleted successfully",
+            "filename": filename
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Python Sandbox Endpoints
+
+@app.get("/python-sandbox")
+def python_sandbox():
+    """Serve the Python sandbox interface"""
+    return FileResponse("src/static/python_sandbox.html")
+
+@app.post("/api/execute-python")
+def execute_python(code_data: PythonCodeExecute):
+    """Execute Python code and return the output"""
+    try:
+        # Execute Python code in a subprocess with timeout
+        result = subprocess.run(
+            [sys.executable, "-c", code_data.code],
+            capture_output=True,
+            text=True,
+            timeout=5,  # 5 second timeout
+            cwd=str(PYTHON_FILES_DIR)  # Execute in python_files directory
+        )
+
+        return {
+            "output": result.stdout,
+            "error": result.stderr,
+            "returncode": result.returncode
+        }
+    except subprocess.TimeoutExpired:
+        return {
+            "output": "",
+            "error": "Execution timed out (5 second limit)",
+            "returncode": -1
+        }
+    except Exception as e:
+        return {
+            "output": "",
+            "error": f"Execution error: {str(e)}",
+            "returncode": -1
+        }
+
+@app.get("/api/python-files")
+def list_python_files():
+    """List all Python files in the python_files directory"""
+    try:
+        files = []
+        for file_path in PYTHON_FILES_DIR.glob("*.py"):
+            files.append(file_path.name)
+        return sorted(files)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/python-files/{filename}")
+def get_python_file(filename: str):
+    """Get the content of a specific Python file"""
+    # Security: Prevent directory traversal attacks
+    if ".." in filename or "/" in filename:
+        raise HTTPException(status_code=400, detail="Invalid filename")
+
+    file_path = PYTHON_FILES_DIR / filename
+
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+
+    try:
+        content = file_path.read_text(encoding="utf-8")
+        return {
+            "filename": filename,
+            "content": content
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/python-files")
+def create_python_file(file_data: PythonFileCreate):
+    """Create or update a Python file"""
+    # Security: Prevent directory traversal attacks
+    if ".." in file_data.filename or "/" in file_data.filename:
+        raise HTTPException(status_code=400, detail="Invalid filename")
+
+    # Ensure filename ends with .py
+    if not file_data.filename.endswith(".py"):
+        file_data.filename += ".py"
+
+    file_path = PYTHON_FILES_DIR / file_data.filename
+
+    try:
+        file_path.write_text(file_data.content, encoding="utf-8")
+        return {
+            "message": "File saved successfully",
+            "filename": file_data.filename
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/python-files/{filename}")
+def delete_python_file(filename: str):
+    """Delete a Python file"""
+    # Security: Prevent directory traversal attacks
+    if ".." in filename or "/" in filename:
+        raise HTTPException(status_code=400, detail="Invalid filename")
+
+    file_path = PYTHON_FILES_DIR / filename
 
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="File not found")

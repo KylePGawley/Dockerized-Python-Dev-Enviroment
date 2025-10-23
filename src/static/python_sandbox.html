@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Sandbox - Gawly Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0e27;
+            --bg-darker: #060920;
+            --bg-card: #151932;
+            --cyan: #00ffff;
+            --green: #00ff41;
+            --purple: #b624ff;
+            --red: #ff2e63;
+            --text: #e0e0e0;
+            --text-dim: #a0a0a0;
+            --border: rgba(0, 255, 255, 0.3);
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(21, 25, 50, 0.95);
+            border-bottom: 2px solid var(--cyan);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: var(--cyan);
+            text-shadow: 0 0 10px var(--cyan);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid var(--cyan);
+            background: transparent;
+            color: var(--cyan);
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background: var(--cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--cyan);
+            transform: translateY(-2px);
+        }
+
+        .btn-run {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .btn-run:hover {
+            background: var(--green);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--green);
+        }
+
+        .btn-clear {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .btn-clear:hover {
+            background: var(--red);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--red);
+        }
+
+        .btn-back {
+            border-color: var(--purple);
+            color: var(--purple);
+        }
+
+        .btn-back:hover {
+            background: var(--purple);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--purple);
+        }
+
+        /* Main Content */
+        .content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: var(--bg-card);
+            border-right: 2px solid var(--border);
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            color: var(--cyan);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-item:hover {
+            background: rgba(0, 255, 255, 0.15);
+            border-color: var(--cyan);
+            transform: translateX(5px);
+        }
+
+        .file-name {
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--red);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            color: #ff5588;
+            transform: scale(1.2);
+        }
+
+        /* Editor Area */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .editor-container {
+            display: flex;
+            gap: 1rem;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: rgba(0, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--cyan);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #editor {
+            flex: 1;
+            min-height: 0;
+        }
+
+        .output-console {
+            flex: 1;
+            background: var(--bg-darker);
+            color: var(--text);
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .output-line {
+            margin-bottom: 0.25rem;
+        }
+
+        .output-error {
+            color: var(--red);
+        }
+
+        .output-success {
+            color: var(--green);
+        }
+
+        .output-info {
+            color: var(--cyan);
+        }
+
+        /* Filename Input */
+        .filename-input {
+            padding: 0.5rem;
+            background: var(--bg-darker);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+            border-radius: 4px;
+        }
+
+        .filename-input:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        /* Message */
+        .message {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        .message.success {
+            background: rgba(0, 255, 65, 0.2);
+            border: 2px solid var(--green);
+            color: var(--green);
+        }
+
+        .message.error {
+            background: rgba(255, 46, 99, 0.2);
+            border: 2px solid var(--red);
+            color: var(--red);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--cyan);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00cccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🐍 Python Sandbox</h1>
+            <div class="header-actions">
+                <input type="text" id="filenameInput" class="filename-input" placeholder="script.py" value="script.py">
+                <button class="btn" onclick="saveFile()">💾 Save</button>
+                <button class="btn btn-run" onclick="runCode()">▶️ Run</button>
+                <button class="btn btn-clear" onclick="clearOutput()">🗑️ Clear</button>
+                <button class="btn btn-back" onclick="window.location.href='/'">← Back</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h2>📁 Saved Scripts</h2>
+                <ul id="fileList" class="file-list">
+                    <!-- Files will be loaded here -->
+                </ul>
+            </div>
+
+            <!-- Editor Area -->
+            <div class="editor-area">
+                <div class="editor-container">
+                    <!-- Code Panel -->
+                    <div class="panel">
+                        <div class="panel-header">Python Code Editor</div>
+                        <div id="editor"></div>
+                    </div>
+
+                    <!-- Output Panel -->
+                    <div class="panel">
+                        <div class="panel-header">Console Output</div>
+                        <div id="outputConsole" class="output-console">
+                            <div class="output-info">► Ready to execute Python code...</div>
+                            <div class="output-info">► Press "Run" or use Ctrl+Enter to execute</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <script>
+        let editor;
+        let currentFilename = 'script.py';
+
+        // Load Monaco Editor
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+
+        require(['vs/editor/editor.main'], function() {
+            // Initialize Monaco Editor with dark theme
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: `# Write your Python code here...
+# Example:
+print('Hello, World!')
+
+# Try some calculations
+result = 2 + 2
+print(f'2 + 2 = {result}')
+
+# Use loops
+for i in range(5):
+    print(f'Count: {i}')
+`,
+                language: 'python',
+                theme: 'vs-dark',
+                fontSize: 14,
+                fontFamily: 'Consolas, "Courier New", monospace',
+                minimap: { enabled: true },
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                lineNumbers: 'on',
+                renderLineHighlight: 'all',
+                quickSuggestions: true,
+                suggestOnTriggerCharacters: true,
+                wordBasedSuggestions: true,
+                tabSize: 4,
+                insertSpaces: true,
+                autoIndent: 'full',
+                formatOnPaste: true,
+                formatOnType: true,
+            });
+
+            // Add keyboard shortcuts
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, function() {
+                runCode();
+            });
+
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function() {
+                saveFile();
+            });
+
+            // Load files after editor is initialized
+            loadFiles();
+        });
+
+        // Load saved files
+        async function loadFiles() {
+            try {
+                const response = await fetch('/api/python-files');
+                const files = await response.json();
+
+                const fileList = document.getElementById('fileList');
+                fileList.innerHTML = '';
+
+                if (files.length === 0) {
+                    fileList.innerHTML = '<li style="color: var(--text-dim); padding: 1rem;">No saved files</li>';
+                    return;
+                }
+
+                files.forEach(file => {
+                    const li = document.createElement('li');
+                    li.className = 'file-item';
+                    li.innerHTML = `
+                        <span class="file-name" onclick="loadFile('${file}')">${file}</span>
+                        <button class="delete-btn" onclick="deleteFile('${file}', event)">🗑️</button>
+                    `;
+                    fileList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error loading files:', error);
+                showMessage('Failed to load files', 'error');
+            }
+        }
+
+        // Load specific file
+        async function loadFile(filename) {
+            try {
+                const response = await fetch(`/api/python-files/${filename}`);
+                const data = await response.json();
+
+                editor.setValue(data.content);
+                document.getElementById('filenameInput').value = filename;
+                currentFilename = filename;
+
+                showMessage(`Loaded: ${filename}`, 'success');
+            } catch (error) {
+                console.error('Error loading file:', error);
+                showMessage('Failed to load file', 'error');
+            }
+        }
+
+        // Save file
+        async function saveFile() {
+            const filename = document.getElementById('filenameInput').value.trim();
+            const content = editor.getValue();
+
+            if (!filename) {
+                showMessage('Please enter a filename', 'error');
+                return;
+            }
+
+            if (!filename.endsWith('.py')) {
+                showMessage('Filename must end with .py', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/python-files', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        filename: filename,
+                        content: content
+                    })
+                });
+
+                if (response.ok) {
+                    currentFilename = filename;
+                    showMessage(`Saved: ${filename}`, 'success');
+                    loadFiles();
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Failed to save file', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving file:', error);
+                showMessage('Failed to save file', 'error');
+            }
+        }
+
+        // Delete file
+        async function deleteFile(filename, event) {
+            event.stopPropagation();
+
+            if (!confirm(`Delete ${filename}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/python-files/${filename}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showMessage(`Deleted: ${filename}`, 'success');
+                    loadFiles();
+
+                    if (currentFilename === filename) {
+                        editor.setValue('');
+                        document.getElementById('filenameInput').value = 'script.py';
+                        clearOutput();
+                    }
+                } else {
+                    showMessage('Failed to delete file', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting file:', error);
+                showMessage('Failed to delete file', 'error');
+            }
+        }
+
+        // Run Python code
+        async function runCode() {
+            const code = editor.getValue();
+            const outputConsole = document.getElementById('outputConsole');
+
+            if (!code.trim()) {
+                showMessage('No code to execute', 'error');
+                return;
+            }
+
+            // Clear previous output and show loading
+            outputConsole.innerHTML = '<div class="output-info"><span class="spinner"></span> Executing...</div>';
+
+            try {
+                const response = await fetch('/api/execute-python', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code
+                    })
+                });
+
+                const result = await response.json();
+
+                // Display output
+                outputConsole.innerHTML = '';
+
+                if (result.output) {
+                    const outputDiv = document.createElement('div');
+                    outputDiv.className = 'output-line output-success';
+                    outputDiv.textContent = result.output;
+                    outputConsole.appendChild(outputDiv);
+                }
+
+                if (result.error) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'output-line output-error';
+                    errorDiv.textContent = '⚠️ Error:\n' + result.error;
+                    outputConsole.appendChild(errorDiv);
+                }
+
+                if (!result.output && !result.error) {
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'output-line output-info';
+                    infoDiv.textContent = '✓ Code executed successfully (no output)';
+                    outputConsole.appendChild(infoDiv);
+                }
+
+            } catch (error) {
+                console.error('Error executing code:', error);
+                outputConsole.innerHTML = '<div class="output-error">⚠️ Failed to execute code</div>';
+                showMessage('Failed to execute code', 'error');
+            }
+        }
+
+        // Clear output console
+        function clearOutput() {
+            const outputConsole = document.getElementById('outputConsole');
+            outputConsole.innerHTML = '<div class="output-info">► Console cleared</div>';
+        }
+
+        // Show message notification
+        function showMessage(text, type) {
+            // Remove existing messages
+            const existing = document.querySelectorAll('.message');
+            existing.forEach(msg => msg.remove());
+
+            // Create new message
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = text;
+            document.body.appendChild(message);
+
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                message.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
