@@ -622,7 +622,7 @@
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
                 <li><a href="/editor">HTML Editor</a></li>
-                <li><a href="#docs">Docs</a></li>
+                <li><a href="/python-sandbox">Python Sandbox</a></li>
             </ul>
         </div>
     </nav>
@@ -647,12 +647,12 @@
                     <span class="feature-badge">EXPLORE →</span>
                 </a>
 
-                <!-- Documentation Card -->
-                <a href="#docs" class="feature-card" onclick="showDocs(event)">
-                    <div class="feature-icon">📚</div>
-                    <h3>Documentation</h3>
-                    <p>Learn how to use the platform, understand the API, and explore development guides and best practices.</p>
-                    <span class="feature-badge">LEARN →</span>
+                <!-- Python Sandbox Card -->
+                <a href="/python-sandbox" class="feature-card">
+                    <div class="feature-icon">🐍</div>
+                    <h3>Python Sandbox</h3>
+                    <p>Write, test, and learn Python code in an interactive environment. Save scripts and see results instantly.</p>
+                    <span class="feature-badge">CODE →</span>
                 </a>
 
                 <!-- API Card -->
@@ -834,14 +834,6 @@
         // ========================================
         // NAVIGATION FUNCTIONALITY
         // ========================================
-
-        /**
-         * Show documentation (placeholder)
-         */
-        function showDocs(event) {
-            event.preventDefault();
-            alert('📚 Documentation\n\nThis platform includes:\n\n• FastAPI Backend\n• Redis Persistence\n• Docker Containerization\n• HTML Editor\n• Task Queue Manager\n\nVisit /docs for API documentation!');
-        }
 
         /**
          * Show API documentation
