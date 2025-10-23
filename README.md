@@ -11,3 +11,4 @@ Anca Iordache https://www.docker.com/blog/containerized-python-development-part-
 10-22-2025 - expirimented with generating and integrating Claude code and GitHub to add an HTML creator/editor feature with persistent storage - allows a user to practice HTML easily.
            - UI improvement using Claude Code, practiced CI/CD with branching Merging and Pull requests
            
+10-23-2025 - Python editor functionality added 
